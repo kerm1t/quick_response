@@ -886,6 +886,7 @@ begin
 //        2: Write(f, chr(220));
 //        1: Write(f, chr(223));
 //        0: Write(f, chr(219));
+// this is not quite correct, s. https://theasciicode.com.ar/extended-ascii-code/bottom-half-block-ascii-code-220.html
         2: Write(f, 'o');//chr(220));
         1: Write(f, 'o');//chr(223));
         0: Write(f, 'o');//chr(219));
@@ -900,13 +901,10 @@ procedure QRCode.SaveImg(cnv: TCanvas);
 var
   row, col, ch: Byte;
   val: Module;
-  rowout: Byte;
 begin
   row := 0;
-   rowout := 0;
   while row < QRSize do
   begin
-//    Write(f, '  ');
     for col := 0 to QRSize - 1 do
     begin
       ch := 0;
@@ -921,25 +919,19 @@ begin
       else
         ch := ch or 1;
       case ch of
-        3: begin
-        cnv.Pixels[col,rowout] := clWhite;
-        end;
+        3: cnv.Pixels[col,row] := clWhite;
 // https://theasciicode.com.ar/extended-ascii-code/bottom-half-block-ascii-code-220.html
-        2: begin  //220
-        cnv.Pixels[col,rowout+1] := clBlack;
-        end;
-        1: begin //223
-        cnv.Pixels[col,rowout] := clBlack;
-        end;
+        2:   //220
+          cnv.Pixels[col,row+1] := clBlack;
+        1:  //223
+          cnv.Pixels[col,row] := clBlack;
         0: begin //219
-        cnv.Pixels[col,rowout] := clBlack;
-        cnv.Pixels[col,rowout+1] := clBlack;
+          cnv.Pixels[col,row] := clBlack;
+          cnv.Pixels[col,row+1] := clBlack;
         end;
       end;
     end;
-//    WriteLn(f);
     row := row + 2;
-    rowout := rowout + 2;
   end;
 end;
 
